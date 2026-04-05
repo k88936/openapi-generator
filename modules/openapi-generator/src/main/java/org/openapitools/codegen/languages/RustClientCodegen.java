@@ -323,6 +323,14 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
         for (ModelMap model : objs.getModels()) {
             CodegenModel cm = model.getModel();
 
+            // A discriminator without oneOf/allOf mapping should not force enum generation.
+            // Keep it as a regular struct model so object properties are preserved.
+            if (cm.discriminator != null
+                    && (cm.oneOf == null || cm.oneOf.isEmpty())
+                    && (cm.discriminator.getMappedModels() == null || cm.discriminator.getMappedModels().isEmpty())) {
+                cm.discriminator = null;
+            }
+
             // Remove the discriminator field from the model, serde will take care of this
             if (cm.discriminator != null) {
                 String reserved_var_name = cm.discriminator.getPropertyBaseName();

@@ -1,0 +1,16 @@
+openapi: 3.1.0
+info:
+  title: Rust discriminator no mapping test
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Issue:
+      type: object
+      properties:
+        id:
+          type: string
+        $type:
+          type: string
+      discriminator:
+        propertyName: $type

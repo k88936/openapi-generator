@@ -290,4 +290,21 @@ public class RustClientCodegenTest {
         TestUtils.assertFileExists(outputPath);
         TestUtils.assertFileContains(outputPath, enumSpec);
     }
+
+    @Test
+    public void testDiscriminatorWithoutMappingGeneratesStruct() throws IOException {
+        Path target = Files.createTempDirectory("test");
+        target.toFile().deleteOnExit();
+        final CodegenConfigurator configurator = new CodegenConfigurator()
+                .setGeneratorName("rust")
+                .setInputSpec("src/test/resources/3_1/rust-discriminator-no-mapping.yaml")
+                .setSkipOverwrite(false)
+                .setOutputDir(target.toAbsolutePath().toString().replace("\\", "/"));
+        new DefaultGenerator().opts(configurator.toClientOptInput()).generate();
+
+        Path outputPath = Path.of(target.toString(), "/src/models/issue.rs");
+        TestUtils.assertFileExists(outputPath);
+        TestUtils.assertFileContains(outputPath, linearize("pub struct Issue {"));
+        TestUtils.assertFileNotContains(outputPath, linearize("pub enum Issue {"));
+    }
 }
